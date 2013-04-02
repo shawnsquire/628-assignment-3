@@ -1,0 +1,10 @@
+*.class
+R.java
+
+# Package Files #
+*.war
+*.ear
+bin\
+gen\
+bin/
+gen/
