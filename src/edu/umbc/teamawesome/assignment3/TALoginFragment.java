@@ -3,6 +3,7 @@ package edu.umbc.teamawesome.assignment3;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,7 +20,6 @@ public class TALoginFragment extends Fragment
 		public void userDidLogin();
 	}
 
-	
 	private ProgressDialog progress;
 	private TALoginDelegate delegate;
 	
@@ -81,13 +81,13 @@ public class TALoginFragment extends Fragment
         @Override
         public void onClick(View view) 
         {
-        	delegate.userDidLogin();
         	
-//    		TAMapFragment mapFragment = new TAMapFragment();
-//    		FragmentTransaction fragmentTransaction =
-//    				getFragmentManager().beginTransaction();
-//    		fragmentTransaction.replace(R.id.activity_layout, mapFragment);
-//    		fragmentTransaction.commit();
+    		TACreateUserFragment createFragment = new TACreateUserFragment();
+    		FragmentTransaction fragmentTransaction =
+    				getFragmentManager().beginTransaction();
+    		fragmentTransaction.replace(R.id.activity_layout, createFragment);
+    		fragmentTransaction.addToBackStack(null);
+    		fragmentTransaction.commit();
 
         }
     };

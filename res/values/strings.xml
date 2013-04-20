@@ -28,4 +28,8 @@
     
     <string name="login_failed">Incorrect username and / or password</string>
 
+    <string name="firstname">First Name</string>
+    <string name="lastname">Last Name</string>
+    
+    
 </resources>

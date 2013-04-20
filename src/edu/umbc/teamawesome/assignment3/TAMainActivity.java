@@ -7,6 +7,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
+import edu.umbc.teamawesome.assignment3.TACreateUserFragment.TACreateUserDelegate;
 import edu.umbc.teamawesome.assignment3.TALoginFragment.TALoginDelegate;
 
 import android.location.Criteria;
@@ -19,7 +20,7 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
 
-public class TAMainActivity extends Activity implements TALoginDelegate
+public class TAMainActivity extends Activity implements TALoginDelegate, TACreateUserDelegate
 {
 	private static int DEFAULT_ZOOM_LEVEL = 18;
 
@@ -93,7 +94,8 @@ public class TAMainActivity extends Activity implements TALoginDelegate
 			@Override
 			public void onLocationChanged(Location location) {
 //				newLocation(location);
-				updateMap();
+				if(mapFragment.isVisible())
+					updateMap();
 			}
 			
 			@Override
@@ -140,5 +142,18 @@ public class TAMainActivity extends Activity implements TALoginDelegate
 			
 		}	
 		
+	}
+
+	@Override
+	public void userWasCreated() 
+	{
+		if(mapFragment != null)
+		{					
+			FragmentTransaction fragmentTransaction =
+					getFragmentManager().beginTransaction();
+			fragmentTransaction.replace(R.id.activity_layout, mapFragment);
+			fragmentTransaction.commit();
+			
+		}			
 	}
 }
