@@ -1,12 +1,8 @@
 package edu.umbc.teamawesome.assignment3;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 public class TALoginFragment extends Fragment 
 {
@@ -140,6 +135,10 @@ public class TALoginFragment extends Fragment
 			public void webServiceDidFailWithError(String errorString) 
 			{
 				isLoading(false);
+				passwordField.setText("");
+	        	AlertDialog.Builder builder = new AlertDialog.Builder(getActivity()); 
+	        	builder.setMessage(R.string.login_failed).setTitle("Error");
+	        	builder.create().show();
 				Log.i("WEBSERVICE", errorString);
 			}
 		});
