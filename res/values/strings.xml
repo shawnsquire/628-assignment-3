@@ -1,8 +1,28 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--APP-->
+    <string name="app_name">Assignment 3</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Assignment ?3</string>
+   
+    <!--Webservice-->
+    <string name="api_base_url">http://maple.cs.umbc.edu/cmsc628/api.php?</string>
+    <string name="get_locations_url">action=get_locations</string>
+    <string name="get_location_url">action=get_location&amp;id_user=%s</string>
+    <string name="set_location" formatted="false">action=set_location&amp;id_user=%s&amp;longitude=%s&amp;latitude=%s</string>
+    <string name="authenticate" formatted="false">action=authenticate&amp;username=%s&amp;password=%s</string>
+    <string name="create_user" formatted="false">action=create_user&amp;username=%s&amp;password=%s&amp;firstname=%s</string>
+    <string name="get_chats" formatted="false">action=get_chats&amp;id_user=%s</string>
+    <string name="send_chat" formatted="false">action=send_chat&amp;id_user_to=%s&amp;id_user_from=%s&amp;message=%s</string>
+    
+<!--LOGIN-->
+    <string name="login_title">Log In</string>
+    <string name="login_btn">Login</string>
+    <string name="create_btn">Create New User</string>
+    <string name="logout_btn">Log Out</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
 
-    <string name="app_name">Assignment3</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="logout_title">Log Out</string>
+    <string name="logged_in_as">Currently logged in as:</string>
 
 </resources>
