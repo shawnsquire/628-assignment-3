@@ -25,11 +25,15 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ListView;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.content.Context;
 
 public class TAMainActivity extends Activity implements TALoginDelegate, TACreateUserDelegate
@@ -37,7 +41,6 @@ public class TAMainActivity extends Activity implements TALoginDelegate, TACreat
 	private static int DEFAULT_ZOOM_LEVEL = 19;
 	private static int REFRESH_RATE = 10000;
 	//rough estimation, will vary depending on current lat/long
-	private static double KM_TO_DEGREE = .008;
 	private static double RANGE = 1000; // meters
 	
 	private ProgressDialog progress;
@@ -47,6 +50,8 @@ public class TAMainActivity extends Activity implements TALoginDelegate, TACreat
 	private Location currentLocation;
 	private ArrayList<TAUser> userList;
 	private boolean shouldUpdate;
+	private ActionBar bar;
+	private ListView usernameList;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
@@ -81,8 +86,14 @@ public class TAMainActivity extends Activity implements TALoginDelegate, TACreat
 		{
 			updateMap();
 		}
-		
-		showLogin();
+
+		if((TAUserPreferences.getUserId(this) == null || TAUserPreferences.getUserId(this).isEmpty())) {
+			showLogin();
+			if(bar != null) bar.removeAllTabs();
+		} else {
+			showMap();
+			createTabBar();
+		}
 		
 	    super.onResume();
 	}	
@@ -95,7 +106,6 @@ public class TAMainActivity extends Activity implements TALoginDelegate, TACreat
 			FragmentTransaction fragmentTransaction =
 					getFragmentManager().beginTransaction();
 			fragmentTransaction.add(R.id.activity_layout, loginFragment);
-			fragmentTransaction.addToBackStack(null);
 			fragmentTransaction.commit();
 		}
 	}
@@ -110,7 +120,63 @@ public class TAMainActivity extends Activity implements TALoginDelegate, TACreat
 			fragmentTransaction.replace(R.id.activity_layout, mapFragment);
 			fragmentTransaction.addToBackStack(null);
 			fragmentTransaction.commit();
-		}		
+		} else {
+			createMap();
+		}
+	}
+	
+	public void showChat()
+	{
+		TAChatFragment chatFragment = new TAChatFragment();
+		FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+		fragmentTransaction.replace(R.id.activity_layout, chatFragment);
+		fragmentTransaction.addToBackStack(null);
+		fragmentTransaction.commit();
+	}
+	
+	private void createTabBar() {
+
+		bar = getActionBar();
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
+		
+        if(bar.getTabCount() == 0) {
+	        bar.addTab(bar.newTab()
+	                .setText("Map")
+	                .setTabListener(new TabListener() {
+						
+						@Override
+						public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
+						}
+	
+						@Override
+						public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
+							showMap();
+						}
+						
+						@Override
+						public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
+							
+						}
+					}));
+	        bar.addTab(bar.newTab()
+	                .setText("Chat")
+	                .setTabListener(new TabListener() {
+						
+						@Override
+						public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
+						}
+						
+						@Override
+						public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
+							showChat();
+						}
+						
+						@Override
+						public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
+						}
+					}));
+        }
 	}
 	
 	
@@ -118,6 +184,7 @@ public class TAMainActivity extends Activity implements TALoginDelegate, TACreat
 	public void onBackPressed() {
 		if(getFragmentManager().getBackStackEntryCount() == 1)	
 			finish();
+		
 		super.onBackPressed();
 	}
 	
@@ -182,7 +249,11 @@ public class TAMainActivity extends Activity implements TALoginDelegate, TACreat
 
 			if(currentLocation != null)
 			{
-				options.mapType(GoogleMap.MAP_TYPE_NORMAL).compassEnabled(true).rotateGesturesEnabled(true).tiltGesturesEnabled(true).camera(new CameraPosition(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM_LEVEL, 0, 0));
+				options.mapType(GoogleMap.MAP_TYPE_NORMAL);
+				options.compassEnabled(true);
+				options.rotateGesturesEnabled(true);
+				options.tiltGesturesEnabled(true);
+				options.camera(new CameraPosition(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM_LEVEL, 0, 0));
 			}
 			if(mapFragment == null)
 			{
@@ -281,6 +352,8 @@ public class TAMainActivity extends Activity implements TALoginDelegate, TACreat
 	public void userDidLogin() 
 	{
 		showMap();
+
+		createTabBar();
 	}
 
 	@Override
@@ -289,6 +362,8 @@ public class TAMainActivity extends Activity implements TALoginDelegate, TACreat
 		getFragmentManager().popBackStack();
 		
 		showMap();
+
+		createTabBar();
 	}
 	
     protected void isLoading(boolean isLoading)
