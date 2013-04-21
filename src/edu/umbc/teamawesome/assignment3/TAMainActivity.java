@@ -112,15 +112,6 @@ public class TAMainActivity extends Activity implements TALoginDelegate, TACreat
 		}		
 	}
 	
-//	@Override
-//	public boolean onKeyDown(int keyCode, KeyEvent event) {
-//	    if ((keyCode == KeyEvent.KEYCODE_BACK) && getFragmentManager().getBackStackEntryCount() == 1 && 
-//	    		(TAUserPreferences.getUserId(this) == null || TAUserPreferences.getUserId(this).isEmpty())) 
-//	    {
-//	    	finish();
-//	    }
-//	    return super.onKeyDown(keyCode, event);
-//	}
 	
 	@Override
 	public void onBackPressed() {
