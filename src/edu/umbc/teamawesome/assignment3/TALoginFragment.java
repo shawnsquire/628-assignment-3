@@ -5,11 +5,15 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnKeyListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -116,9 +120,12 @@ public class TALoginFragment extends Fragment
         return true;
     }
 
-    private void login(String username, String password)
+    private void login(final String username, String password)
     {
     	isLoading(true);
+    	
+	    final InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+	    imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
     	
     	TAWebService.authenticate(username, password, getActivity(), new TAWebServiceDelegate() 
     	{
@@ -127,6 +134,8 @@ public class TALoginFragment extends Fragment
 			public void webServiceDidFinishWithResult(Object result) 
 			{
 				isLoading(false);
+				TAUserPreferences.setCurrentUser(getActivity(), (TAUser) result);
+
 				delegate.userDidLogin();
 				Log.i("WEBSERVICE", "success");
 			}
@@ -139,7 +148,7 @@ public class TALoginFragment extends Fragment
 	        	AlertDialog.Builder builder = new AlertDialog.Builder(getActivity()); 
 	        	builder.setMessage(R.string.login_failed).setTitle("Error");
 	        	builder.create().show();
-				Log.i("WEBSERVICE", errorString);
+				Log.i("WEBSERVICE", "authenticate did fail with error: " + errorString);
 			}
 		});
     	
