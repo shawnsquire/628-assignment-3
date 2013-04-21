@@ -38,6 +38,7 @@ public class TAMainActivity extends Activity implements TALoginDelegate, TACreat
 	private static int REFRESH_RATE = 10000;
 	//rough estimation, will vary depending on current lat/long
 	private static double KM_TO_DEGREE = .008;
+	private static double RANGE = 1000; // meters
 	
 	private ProgressDialog progress;
 	private GoogleMap map;
@@ -238,11 +239,19 @@ public class TAMainActivity extends Activity implements TALoginDelegate, TACreat
 				
 				map.clear();
 				
+				Location currentLoc = new Location("current");
+				currentLoc.setLatitude(currentLocation.getLatitude());
+				currentLoc.setLongitude(currentLocation.getLongitude());
+				
 				for(TAUser user: userList)
 				{
-
-					if(Double.valueOf(user.getLatitude()) - currentLocation.getLatitude() <= KM_TO_DEGREE && 
-							Double.valueOf(user.getLongitude()) - currentLocation.getLongitude() <= KM_TO_DEGREE && 
+					Location userLoc = new Location("user");
+					userLoc.setLatitude(Double.valueOf(user.getLatitude()));
+					userLoc.setLongitude(Double.valueOf(user.getLongitude()));
+					
+					float distance = currentLoc.distanceTo(userLoc);
+					
+					if(distance < RANGE && 
 							!user.getUserId().equalsIgnoreCase(TAUserPreferences.getUserId(TAMainActivity.this)))
 					{
 						Log.i("WEBSERVICE", "marker created for " + user.getUsername());
@@ -250,10 +259,16 @@ public class TAMainActivity extends Activity implements TALoginDelegate, TACreat
 						MarkerOptions marker = new MarkerOptions();
 						marker.draggable(false);
 						marker.position(new LatLng(Double.valueOf(user.getLatitude()), Double.valueOf(user.getLongitude())));
-						marker.title(user.getUsername().length() > 0 ? user.getUsername() : "Marker");
+						if (user.getFirstname().length() > 0 || user.getLastname().length() > 0) {
+							marker.title(user.getFirstname() + " " + user.getLastname() + " [" + user.getUsername() + "]");
+						} else {
+							marker.title(user.getUsername().length() > 0 ? "[" + user.getUsername() +"]" : "Marker");
+						}
 						marker.snippet(user.getTime());
 
 						map.addMarker(marker);
+					} else {
+//						Log.w("WEBSERVICE", "marker NOT created for " + user.getUsername() + " at distance " + distance) ;
 					}
 				}
 			}
