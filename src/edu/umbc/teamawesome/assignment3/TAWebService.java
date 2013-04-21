@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.http.HttpEntity;
@@ -15,6 +16,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,7 +46,14 @@ public class TAWebService {
 	protected static final String kGetChatsMethod = "get_chats";
 	protected static final String kSendChatsMethod = "send_chat";
 
-	
+	protected static final String kUserId = "id_user";
+	protected static final String kTime= "time";
+	protected static final String kLatitude = "latitude";
+	protected static final String kLongitude = "longitude";
+	protected static final String kUsername = "username";
+	protected static final String kFirstname = "firstname";
+	protected static final String kLastname = "lastname";
+
 	public static String convertStreamToString(InputStream is) 
 	{
 		
@@ -215,18 +224,48 @@ public class TAWebService {
 					{
 						Log.i("WEBSERVICE", object.get("success").toString());
 
+						ArrayList<TAUser> userList = new ArrayList<TAUser>();
 						
-						delegate.webServiceDidFinishWithResult(object.get("success"));
+						JSONArray jsonArray = object.getJSONArray("success");
+						for(int i = 0; i < jsonArray.length(); i++)
+						{
+							JSONObject obj = jsonArray.getJSONObject(i);
+							TAUser user = new TAUser();
+							user.setFirstname(obj.getString(kFirstname));
+							user.setLastname(obj.getString(kLastname));
+							user.setLatitude(obj.getString(kLatitude));
+							user.setLongitude(obj.getString(kLongitude));
+							user.setTime(obj.getString(kTime));
+							user.setUserId(obj.getString(kUserId));
+							user.setUsername(obj.getString(kUsername));
+							userList.add(user);
+							
+							Log.i("WEBSERVICES", user.toString());
+						}
+						
+						delegate.webServiceDidFinishWithResult(userList);
 					}
 					else
 					{
 						delegate.webServiceDidFailWithError("Get Locations Failed");
 					}
+					
+
+//					ArrayList<TAUser> userList = TAParser.parseLocations(result);
+//
+//					if(userList != null)
+//					{
+//						delegate.webServiceDidFinishWithResult(userList);
+//					}
+//					else
+//					{
+//						delegate.webServiceDidFailWithError("Get Locations Failed");
+//					}
 				} 
-				catch (JSONException e)
-				{
-					delegate.webServiceDidFailWithError(e.getLocalizedMessage());
-				}
+//				catch (JSONException e)
+//				{
+//					delegate.webServiceDidFailWithError(e.getLocalizedMessage());
+//				}
 				catch(Exception e)
 				{
 					delegate.webServiceDidFailWithError(e.getLocalizedMessage());
@@ -266,7 +305,7 @@ public class TAWebService {
 					JSONObject object = new JSONObject(jsonString);
 					
 					if(object.has("success"))
-					{
+					{						
 						delegate.webServiceDidFinishWithResult(object.get("success"));
 					}
 					else
@@ -356,6 +395,8 @@ public class TAWebService {
 			@Override
 			public void webRequestDidFailWithError(String errorString)
 			{
+				Log.i("WEBSERVICE", "webrequest failed");
+
 				delegate.webServiceDidFailWithError(errorString);
 			}
 
@@ -365,30 +406,37 @@ public class TAWebService {
 				try
 				{
 					String jsonString = convertStreamToString(result);
+					Log.i("WEBSERVICE", jsonString);
+
 					JSONObject object = new JSONObject(jsonString);
-					
+//					
 					if(object.has("success"))
 					{
 						TAUser user = new TAUser();
 						user.setUsername(userName);
 						user.setUserId(object.get("success").toString());
-						Log.i("WEBSERVICE", object.get("success").toString());
-
-						TAUserPreferences.setCurrentUser(ctx, user);
-						
+						Log.i("WEBSERVICE", "success" + object.get("success").toString());
+//
+//						TAUserPreferences.setCurrentUser(ctx, user);
+//						
 						delegate.webServiceDidFinishWithResult(user);
 					}
 					else
 					{
 						delegate.webServiceDidFailWithError("Login Failed");
 					}
+
 				} 
-				catch (JSONException e)
-				{
-					delegate.webServiceDidFailWithError(e.getLocalizedMessage());
-				}
+//				catch (JSONException e)
+//				{
+//					Log.i("WEBSERVICE", "json exception");
+//
+//					delegate.webServiceDidFailWithError(e.getLocalizedMessage());
+//				}
 				catch(Exception e)
 				{
+					Log.i("WEBSERVICE", "exception");
+
 					delegate.webServiceDidFailWithError(e.getLocalizedMessage());
 				}
 			}
